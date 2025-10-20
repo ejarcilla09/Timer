@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demon Slayer Countdown Timer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('https://static0.cbrimages.com/wordpress/wp-content/uploads/2025/02/tengen-vs-gyutaro-in-demon-slayer-season-2-episode-17.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            overflow: hidden;
+            position: relative;
+            perspective: 100px;
+            transition: background-image 1s ease;
+            color: #ffd700;
+            margin: 0;
+        }
+
+        /* Enhanced Particle Effects */
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 215, 0, 0.7);
+            border-radius: 50%;
+            animation: fall 10s linear infinite, swirl 8s linear infinite, fade 3s linear infinite;
+            pointer-events: none;
+        }
+
+        .blossom {
+            background: rgba(255, 182, 193, 0.8);
+            width: 8px;
+            height: 8px;
+            animation: float 12s linear infinite, swirl 10s linear infinite, fade 4s linear infinite;
+        }
+
+        .spark {
+            background: rgba(255, 69, 0, 0.6);
+            width: 4px;
+            height: 4px;
+            animation: sparkFall 6s linear infinite, swirl 6s linear infinite, fade 2s linear infinite;
+        }
+
+        @keyframes fall { 0% { transform: translateY(-100vh) translateX(-50vw) rotate(0deg); } 100% { transform: translateY(100vh) translateX(50vw) rotate(360deg); } }
+        @keyframes float { 0% { transform: translateY(-100vh) translateX(-50vw) rotate(0deg); } 100% { transform: translateY(100vh) translateX(50vw) rotate(720deg); } }
+        @keyframes sparkFall { 0% { transform: translateY(-100vh) translateX(-30vw) rotate(45deg); } 100% { transform: translateY(100vh) translateX(30vw) rotate(-45deg); } }
+        @keyframes swirl { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fade { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+        .parallax-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.1));
+            transform: translateZ(-1px) scale(1.1);
+            z-index: -1;
+        }
+
+        .pulse-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(255, 69, 0, 0.1) 0%, rgba(0, 0, 0, 0.5) 70%);
+            z-index: -1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.3; } 100% { transform: scale(1); opacity: 0.5; } }
+
+        .timer-card {
+            background: linear-gradient(135deg, rgba(25, 25, 50, 0.95), rgba(40, 40, 70, 0.95));
+            backdrop-filter: blur(10px);
+            padding: 0.6rem;
+            border-radius: 1rem;
+            border: 2px solid #ff4500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 69, 0, 0.3);
+            text-align: center;
+            max-width: 480px;
+            transform: translateY(0);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .timer-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 69, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .timer-card::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px; right: -1px; bottom: -1px;
+            background: linear-gradient(45deg, #ff4500, #ffd700, #ff4500);
+            z-index: -1;
+            border-radius: 1rem;
+            filter: blur(6px);
+            animation: glowPulse 4s infinite;
+        }
+
+        @keyframes glowPulse { 0% { opacity: 0.3; } 50% { opacity: 0.8; } 100% { opacity: 0.3; } }
+
+        .card-header {
+            background: linear-gradient(45deg, #ff4500, #dc143c);
+            color: #ffd700;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border-radius: 0.8rem 0.8rem 0 0;
+            padding: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .card-body {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 0.3rem;
+        }
+
+        .card-footer {
+            background: rgba(25, 25, 50, 0.8);
+            border-top: 1px solid #ff4500;
+            padding: 0.4rem;
+            font-size: 0.8rem;
+            color: #ffd700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        #timeDisplay {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+            animation: flamePulse 1.5s infinite;
+        }
+
+        @keyframes flamePulse { 0%, 100% { transform: scale(1); color: #ffd700; } 50% { transform: scale(1.02); color: #ff4500; } }
+
+        #progressBar {
+            width: 100%;
+            height: 15px;
+            margin: 0.5rem 0;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            border: 1px solid #ff4500;
+            transition: all 0.3s ease;
+        }
+
+        #progressBar::-webkit-progress-bar { background: rgba(0, 0, 0, 0.5); border-radius: 8px; }
+        #progressBar::-webkit-progress-value { background: linear-gradient(90deg, #ff4500, #ffd700); border-radius: 8px; transition: width 0.5s ease; }
+
+        .form-control-custom {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #ff4500;
+            color: #ffd700;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .form-control-custom:focus {
+            outline: none;
+            border-color: #ffd700;
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-custom {
+            margin: 0.1rem;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 69, 0, 0.5);
+        }
+
+        #startBtn { background: linear-gradient(45deg, #ff4500, #dc143c); color: white; border: none; }
+        #pauseBtn { background: linear-gradient(45deg, #4682b4, #191970); color: white; border: none; }
+        #resetBtn { background: linear-gradient(45deg, #ff0000, #8b0000); color: white; border: none; }
+        #shareBtn { background: linear-gradient(45deg, #ffd700, #ff8c00); color: white; border: none; }
+        #savePresetBtn { background: linear-gradient(45deg, #6a5acd, #483d8b); color: white; border: none; }
+        #loadPresetBtn { background: linear-gradient(45deg, #32cd32, #228b22); color: white; border: none; }
+        #themeBtn { background: linear-gradient(45deg, #ff4500, #ffd700); color: white; border: none; }
+        #deleteImageBtn { background: linear-gradient(45deg, #ff4500, #8b0000); color: white; border: none; padding: 0.3rem 0.8rem; }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 180px;
+            border-radius: 0.8rem;
+            margin: 0.5rem auto;
+            display: none;
+            object-fit: contain;
+            border: 1px solid #ff4500;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        #imagePreview.visible { display: block; opacity: 0; animation: fadeIn 0.5s ease forwards; }
+        #imagePreview.loading { filter: blur(4px); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 1rem;
+            box-shadow: 0 0 20px rgba(255, 69, 0, 0.6);
+            animation: fadeIn 0.5s ease, pulseModal 2s infinite;
+        }
+
+        .modal.show { display: flex; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulseModal { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+
+        .paste-instruction {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 0.5rem 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        #realTimeClock {
+            position: absolute; top: 0.5rem; right: 0.5rem;
+            background: rgba(25, 25, 50, 0.9);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.4rem;
+            border: 1px solid #ff4500;
+            font-size: 0.8rem;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .notification {
+            position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
+            background: rgba(139, 0, 0, 0.95);
+            padding: 0.5rem 1.2rem;
+            border-radius: 0.4rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .notification.show { opacity: 1; }
+
+        /* Responsive Tweaks */
+        @media (max-width: 576px) {
+            .timer-card { padding: 0.4rem; max-width: 100%; border-radius: 0.8rem; }
+            #timeDisplay { font-size: 1.8rem; }
+            .form-control-custom { font-size: 0.9rem; padding: 0.2rem; }
+            .btn-custom { font-size: 0.7rem; padding: 0.2rem 0.8rem; }
+            #imagePreview { max-height: 100px; }
+            .card-header { font-size: 1.2rem; padding: 0.3rem; }
+            .card-footer { font-size: 0.7rem; padding: 0.3rem; }
+            .card-body { max-height: 50vh; }
+        }
+
+        @media (min-width: 577px) and (max-width: 767px) {
+            .timer-card { max-width: 400px; }
+            #timeDisplay { font-size: 2.2rem; }
+            .form-control-custom { font-size: 1rem; }
+            .btn-custom { font-size: 0.8rem; }
+            .card-body { max-height: 55vh; }
+        }
+
+        @media (min-width: 768px) and (max-width: 991px) {
+            .timer-card { max-width: 450px; }
+            #timeDisplay { font-size: 2.6rem; }
+            .card-body { max-height: 60vh; }
+        }
+
+        @media (min-width: 992px) {
+            .timer-card { max-width: 480px; }
+            #timeDisplay { font-size: 3rem; }
+            .form-control-custom { font-size: 1.2rem; }
+            .btn-custom { font-size: 0.9rem; }
+        }
+
+        @media (min-width: 1200px) {
+            .timer-card { max-width: 500px; }
+            #timeDisplay { font-size: 3.2rem; }
+            .form-control-custom { font-size: 1.3rem; }
+            .btn-custom { font-size: 1rem; }
+            .card-header { font-size: 1.6rem; }
+            .card-body { max-height: 65vh; }
+        }
+    </style>
+</head>
+<body>
+    <div id="realTimeClock"></div>
+    <div class="parallax-layer"></div>
+    <div class="pulse-overlay"></div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+                <div class="timer-card card">
+                    <div class="card-header">Demon Slayer Timer</div>
+                    <div class="card-body">
+                        <input type="text" id="titleInput" class="form-control form-control-custom mb-1" placeholder="Enter Breathing Technique" aria-label="Timer Title">
+                        <div id="timeDisplay" class="mb-1"></div>
+                        <progress id="progressBar" value="100" max="100" class="mb-1"></progress>
+                        <div class="input-group mb-1">
+                            <input type="number" id="minutesInput" class="form-control form-control-custom" min="0" placeholder="MM" aria-label="Minutes">
+                            <input type="number" id="secondsInput" class="form-control form-control-custom" min="0" max="59" placeholder="SS" aria-label="Seconds">
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-center mb-1">
+                            <button id="startBtn" class="btn btn-custom">Ignite</button>
+                            <button id="pauseBtn" class="btn btn-custom">Hold Breath</button>
+                            <button id="resetBtn" class="btn btn-custom">Cleanse</button>
+                            <button id="shareBtn" class="btn btn-custom">Share Technique</button>
+                            <button id="savePresetBtn" class="btn btn-custom">Save Preset</button>
+                            <button id="loadPresetBtn" class="btn btn-custom">Load Preset</button>
+                            <button id="themeBtn" class="btn btn-custom">Change Theme</button>
+                        </div>
+                        <div class="text-center">
+                            <p class="paste-instruction">Paste a Demon Slayer screenshot (Ctrl+V or Cmd+V)</p>
+                            <img id="imagePreview" src="" alt="Pasted Image">
+                            <button id="deleteImageBtn" class="btn btn-custom">Delete Image</button>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        Forged by the Hashira | PHT: <span id="footerTime"></span>
+                    </div>
+                    <div id="notification" class="notification"></div>
+                    <div id="modal" class="modal">
+                        <img id="modalImage" class="modal-content" src="" alt="Full Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let time = 0;
+            let initialTime = 0;
+            let timerInterval;
+            let isRunning = false;
+            let currentImage = '';
+            let presets = JSON.parse(localStorage.getItem('timerPresets')) || [];
+            let currentTheme = 0;
+            const themes = [
+                'https://static0.cbrimages.com/wordpress/wp-content/uploads/2025/02/tengen-vs-gyutaro-in-demon-slayer-season-2-episode-17.jpg',
+                'https://otakunoir.com/wp-content/uploads/2024/03/Demon-Slayer-Hashira-Training-Arc.jpeg',
+                'https://static0.gamerantimages.com/wordpress/wp-content/uploads/2024/06/demon-slayer-muzan-kibutsuji.jpg'
+            ];
+
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                if (Math.random() > 0.5) particle.classList.add('blossom');
+                else if (Math.random() > 0.7) particle.classList.add('spark');
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.animationDuration = `${8 + Math.random() * 10}s`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                document.body.appendChild(particle);
+            }
+
+            const timeDisplay = document.getElementById('timeDisplay');
+            const progressBar = document.getElementById('progressBar');
+            const minutesInput = document.getElementById('minutesInput');
+            const secondsInput = document.getElementById('secondsInput');
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const shareBtn = document.getElementById('shareBtn');
+            const savePresetBtn = document.getElementById('savePresetBtn');
+            const loadPresetBtn = document.getElementById('loadPresetBtn');
+            const themeBtn = document.getElementById('themeBtn');
+            const imagePreview = document.getElementById('imagePreview');
+            const titleInput = document.getElementById('titleInput');
+            const realTimeClock = document.getElementById('realTimeClock');
+            const deleteImageBtn = document.getElementById('deleteImageBtn');
+            const notification = document.getElementById('notification');
+            const footerTime = document.getElementById('footerTime');
+            const modal = document.getElementById('modal');
+            const modalImage = document.getElementById('modalImage');
+
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.classList.add('show');
+                setTimeout(() => notification.classList.remove('show'), 3000);
+            }
+
+            function playBladeClash() {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(220, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.12);
+                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.25);
+            }
+
+            function playBreathingChant() {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(320, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+                setTimeout(() => oscillator.stop(), 60);
+            }
+
+            function playDramaticFinish() {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(120, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(450, audioCtx.currentTime + 1.2);
+                gainNode.gain.setValueAtTime(0.7, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.8);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 1.8);
+            }
+
+            function updateRealTimeClock() {
+                if (realTimeClock && footerTime) {
+                    const now = new Date();
+                    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+                    const phtTime = new Date(utcTime + (8 * 3600000)); // PHT is UTC+8
+                    const hours = phtTime.getHours();
+                    const minutes = String(phtTime.getMinutes()).padStart(2, '0');
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    const hours12 = hours % 12 || 12;
+                    const timeStr = `${hours12}:${minutes} ${ampm}`;
+                    realTimeClock.textContent = `PHT: ${timeStr}`;
+                    footerTime.textContent = timeStr;
+                }
+            }
+
+            updateRealTimeClock();
+            setInterval(updateRealTimeClock, 1000);
+
+            function loadFromURL() {
+                const params = new URLSearchParams(window.location.search);
+                const title = params.get('title') || '';
+                const minutes = parseInt(params.get('minutes')) || 0;
+                const seconds = parseInt(params.get('seconds')) || 0;
+                const image = params.get('image') || '';
+
+                titleInput.value = decodeURIComponent(title);
+                minutesInput.value = minutes || '';
+                secondsInput.value = seconds || '';
+                time = minutes * 60 + seconds;
+                initialTime = time;
+
+                if (image) {
+                    imagePreview.classList.add('loading');
+                    imagePreview.src = decodeURIComponent(image);
+                    imagePreview.onload = () => {
+                        imagePreview.classList.remove('loading');
+                        imagePreview.classList.add('visible');
+                        currentImage = decodeURIComponent(image);
+                    };
+                    imagePreview.onerror = () => imagePreview.classList.remove('loading');
+                }
+
+                updateTime();
+            }
+
+            function updateTime() {
+                const minutes = Math.floor(time / 60);
+                const seconds = time % 60;
+                timeDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                if (initialTime > 0) {
+                    progressBar.value = (time / initialTime) * 100;
+                } else {
+                    progressBar.value = 0;
+                }
+                if (time <= 0 && isRunning) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    playDramaticFinish();
+                    showNotification('Breathing Technique Complete!');
+                }
+            }
+
+            function getInputTime() {
+                const minutes = parseInt(minutesInput.value) || 0;
+                const seconds = parseInt(secondsInput.value) || 0;
+                return minutes * 60 + seconds;
+            }
+
+            startBtn.addEventListener('click', () => {
+                if (!isRunning) {
+                    if (time === 0) {
+                        time = getInputTime();
+                        if (time <= 0) {
+                            alert('Enter a valid time to unleash your technique!');
+                            return;
+                        }
+                    }
+                    initialTime = time;
+                    isRunning = true;
+                    playBladeClash();
+                    timerInterval = setInterval(() => {
+                        if (time > 0) {
+                            time--;
+                            playBreathingChant();
+                            updateTime();
+                        }
+                    }, 1000);
+                }
+            });
+
+            pauseBtn.addEventListener('click', () => {
+                if (isRunning) {
+                    isRunning = false;
+                    clearInterval(timerInterval);
+                }
+            });
+
+            resetBtn.addEventListener('click', () => {
+                isRunning = false;
+                clearInterval(timerInterval);
+                time = 0;
+                initialTime = 0;
+                minutesInput.value = '';
+                secondsInput.value = '';
+                titleInput.value = '';
+                imagePreview.src = '';
+                imagePreview.classList.remove('visible', 'loading');
+                currentImage = '';
+                updateTime();
+                history.replaceState(null, '', window.location.pathname);
+            });
+
+            shareBtn.addEventListener('click', () => {
+                const shareUrl = generateShareURL();
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    showNotification('Technique link copied!');
+                }).catch(err => {
+                    alert('Failed to share technique: ' + err);
+                });
+            });
+
+            savePresetBtn.addEventListener('click', () => {
+                const presetName = prompt('Enter preset name:');
+                if (presetName) {
+                    const preset = {
+                        name: presetName,
+                        title: titleInput.value,
+                        minutes: parseInt(minutesInput.value) || 0,
+                        seconds: parseInt(secondsInput.value) || 0,
+                        image: currentImage
+                    };
+                    presets.push(preset);
+                    localStorage.setItem('timerPresets', JSON.stringify(presets));
+                    showNotification('Preset saved!');
+                    updatePresetDropdown();
+                }
+            });
+
+            loadPresetBtn.addEventListener('click', () => {
+                const presetSelect = document.createElement('select');
+                presetSelect.className = 'form-control form-control-custom mb-1';
+                presetSelect.innerHTML = '<option value="">Select Preset</option>' + presets.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+                
+                const deleteOption = document.createElement('option');
+                deleteOption.value = 'delete';
+                deleteOption.text = 'Delete Preset';
+                presetSelect.appendChild(deleteOption);
+
+                const container = document.createElement('div');
+                container.appendChild(presetSelect);
+                document.body.appendChild(container);
+
+                presetSelect.focus();
+
+                presetSelect.addEventListener('change', () => {
+                    const selectedName = presetSelect.value;
+                    if (selectedName === 'delete') {
+                        const deleteName = prompt('Enter preset name to delete:');
+                        if (deleteName) {
+                            const index = presets.findIndex(p => p.name === deleteName);
+                            if (index !== -1) {
+                                presets.splice(index, 1);
+                                localStorage.setItem('timerPresets', JSON.stringify(presets));
+                                showNotification('Preset deleted!');
+                                updatePresetDropdown();
+                            } else {
+                                showNotification('Preset not found!');
+                            }
+                        }
+                    } else if (selectedName) {
+                        const preset = presets.find(p => p.name === selectedName);
+                        if (preset) {
+                            titleInput.value = preset.title;
+                            minutesInput.value = preset.minutes;
+                            secondsInput.value = preset.seconds;
+                            time = preset.minutes * 60 + preset.seconds;
+                            initialTime = time;
+                            if (preset.image) {
+                                imagePreview.classList.add('loading');
+                                imagePreview.src = preset.image;
+                                imagePreview.onload = () => {
+                                    imagePreview.classList.remove('loading');
+                                    imagePreview.classList.add('visible');
+                                    currentImage = preset.image;
+                                };
+                                imagePreview.onerror = () => imagePreview.classList.remove('loading');
+                            } else {
+                                imagePreview.src = '';
+                                imagePreview.classList.remove('visible', 'loading');
+                                currentImage = '';
+                            }
+                            updateTime();
+                            showNotification('Preset loaded!');
+                        }
+                    }
+                    document.body.removeChild(container);
+                });
+
+                presetSelect.addEventListener('blur', () => document.body.removeChild(container));
+            });
+
+            function updatePresetDropdown() {
+                // This function is called after saving or deleting to ensure the dropdown reflects current presets
+                // No direct UI update here since loadPresetBtn recreates the select dynamically
+            }
+
+            themeBtn.addEventListener('click', () => {
+                currentTheme = (currentTheme + 1) % themes.length;
+                document.body.style.backgroundImage = `url('${themes[currentTheme]}')`;
+                showNotification(`Theme changed to ${['Tengen vs. Gyutaro', 'Hashira Training', 'Final Battle'][currentTheme]}!`);
+            });
+
+            deleteImageBtn.addEventListener('click', () => {
+                imagePreview.src = '';
+                imagePreview.classList.remove('visible', 'loading');
+                currentImage = '';
+                history.replaceState(null, '', generateShareURL());
+                showNotification('Image deleted!');
+            });
+
+            imagePreview.addEventListener('click', () => {
+                if (imagePreview.src) {
+                    modalImage.src = imagePreview.src;
+                    modal.classList.add('show');
+                }
+            });
+
+            modal.addEventListener('click', () => {
+                modal.classList.remove('show');
+            });
+
+            document.addEventListener('paste', (event) => {
+                const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+                for (const item of items) {
+                    if (item.type.indexOf('image') === 0) {
+                        imagePreview.classList.add('loading');
+                        const blob = item.getAsFile();
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            imagePreview.src = e.target.result;
+                            imagePreview.onload = () => {
+                                imagePreview.classList.remove('loading');
+                                imagePreview.classList.add('visible');
+                                currentImage = e.target.result;
+                                history.replaceState(null, '', generateShareURL());
+                            };
+                            imagePreview.onerror = () => imagePreview.classList.remove('loading');
+                        };
+                        reader.readAsDataURL(blob);
+                        break;
+                    }
+                }
+            });
+
+            titleInput.addEventListener('input', () => { history.replaceState(null, '', generateShareURL()); });
+            minutesInput.addEventListener('input', () => { time = getInputTime(); initialTime = time; updateTime(); history.replaceState(null, '', generateShareURL()); });
+            secondsInput.addEventListener('input', () => { time = getInputTime(); initialTime = time; updateTime(); history.replaceState(null, '', generateShareURL()); });
+
+            function generateShareURL() {
+                const title = encodeURIComponent(titleInput.value || '');
+                const minutes = parseInt(minutesInput.value) || 0;
+                const seconds = parseInt(secondsInput.value) || 0;
+                const image = encodeURIComponent(currentImage || '');
+                const baseURL = window.location.origin + window.location.pathname;
+                return `${baseURL}?title=${title}&minutes=${minutes}&seconds=${seconds}&image=${image}`;
+            }
+
+            loadFromURL();
+        });
+    </script>
+</body>
+</html>
